@@ -10,6 +10,19 @@ This library provides character filtering, numeric validation, and international
 
 - [**to-segments**](https://crates.io/crates/to_segments) — Splits string slices and owned strings into vectors and extracts optional strings, pairs of optional strings.
 
+## Features
+
+| Feature | Default | Description |
+| --- | --- | --- |
+| `cell_analysis` | no | Column-level decimal separator detection via `analyze_cell`, `detect_column_format`, and `CellAnalysis` |
+
+Enable in `Cargo.toml`:
+
+```toml
+[dependencies]
+alphanumeric = { version = "0.1", features = ["cell_analysis"] }
+```
+
 ## Related crates
 
 - [**to-segments**](https://crates.io/crates/to_segments) — Provides the `ToSegments` trait for ergonomic string splitting with readable methods for common manipulation tasks. Also used internally by `alphanumeric`.
@@ -202,6 +215,8 @@ assert!("1ec9F9a".is_digits_only_radix(16)); // true
 
 ### Detect decimal separator format across a column of data
 
+*Requires the `cell_analysis` feature.*
+
 ```rust
 use alphanumeric::{analyze_cell, detect_column_format, CellAnalysis, DecimalSeparator};
 
@@ -307,7 +322,7 @@ Defines categories, sets or ranges of characters as well as single characters. U
 | `Range`       | `(Range<char>)` | Match a range, e.g. `'a'..'d'` includes a, b, c but not d               |
 | `Between`     | `(char, char)`  | Match characters between the specified bounds, inclusive on both ends   |
 
-### CellAnalysis
+### CellAnalysis (feature: `cell_analysis`)
 
 Result of analyzing a single cell's decimal separator format, returned by `analyze_cell()`.
 
@@ -318,7 +333,7 @@ Result of analyzing a single cell's decimal separator format, returned by `analy
 | `Either` | Ambiguous — could use either format   |
 | `None`   | No decimal separator present          |
 
-## Functions
+## Functions (feature: `cell_analysis`)
 
 ### analyze_cell
 

@@ -101,15 +101,13 @@ pub fn detect_column_format(cells: &[&str], max_scan: usize) -> DecimalSeparator
         match analyze_cell(cell) {
             CellAnalysis::Point => {
                 point_votes += 1;
-                // Stop early if clear majority
-                if point_votes > comma_votes + 2 && point_votes >= 3 {
+                if comma_votes == 0 && point_votes >= 3 {
                     return DecimalSeparator::Point;
                 }
             }
             CellAnalysis::Comma => {
                 comma_votes += 1;
-                // Stop early if clear majority
-                if comma_votes > point_votes + 2 && comma_votes >= 3 {
+                if point_votes == 0 && comma_votes >= 3 {
                     return DecimalSeparator::Comma;
                 }
             }

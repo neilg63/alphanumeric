@@ -3,10 +3,16 @@ name = "alphanumeric"
 version = "0.1.0"
 edition = "2021"
 description = "International number format parsing and validation with support for multiple separator conventions"
-license = "MIT"
+repository = "https://github.com/neilg63/alphanumeric"
+categories = ["text-processing", "parsing"]
+license = "GPL-2.0-or-later WITH Bison-exception-2.2"
+
+[features]
+default = []
+cell_analysis = []
 
 [dependencies]
-to_segments = "0.1.0"
+to_segments = "0.1"
 
 [lib]
 name = "alphanumeric"

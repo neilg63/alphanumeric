@@ -1,9 +1,11 @@
 use std::str::FromStr;
 
+#[cfg(feature = "cell_analysis")]
 pub mod cell_analysis;
 mod char_type;
 mod uses_decimal_comma;
 
+#[cfg(feature = "cell_analysis")]
 pub use cell_analysis::{analyze_cell, detect_column_format, CellAnalysis};
 pub use char_type::CharType;
 pub use to_segments::ToSegments;
