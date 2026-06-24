@@ -4,7 +4,7 @@ version = "0.1.0"
 edition = "2021"
 description = "International number format parsing and validation with support for multiple separator conventions"
 repository = "https://github.com/neilg63/alphanumeric"
-categories = ["text-processing", "parsing"]
+categories = ["text-processing", "parsing", "internationalization"]
 license = "GPL-2.0-or-later WITH Bison-exception-2.2"
 
 [features]
