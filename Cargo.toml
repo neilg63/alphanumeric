@@ -1,0 +1,13 @@
+[package]
+name = "alphanumeric"
+version = "0.1.0"
+edition = "2021"
+description = "International number format parsing and validation with support for multiple separator conventions"
+license = "MIT"
+
+[dependencies]
+to_segments = "0.1.0"
+
+[lib]
+name = "alphanumeric"
+path = "src/lib.rs"
