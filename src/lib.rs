@@ -37,10 +37,10 @@ pub trait IsNumeric {
     fn is_numeric(&self) -> bool;
 }
 
-impl IsNumeric for str {
-    /// Check if the string may be parsed to a number
+impl<T: AsRef<str>> IsNumeric for T {
     fn is_numeric(&self) -> bool {
-        let num_chars = self.chars().count();
+        let s = self.as_ref();
+        let num_chars = s.chars().count();
         if num_chars < 1 {
             return false;
         }
@@ -48,7 +48,7 @@ impl IsNumeric for str {
         let mut num_valid: usize = 0;
         let mut index: usize = 0;
         let mut num_decimal_separators = 0usize;
-        for c in self.chars().into_iter() {
+        for c in s.chars().into_iter() {
             let is_digit = c.is_digit(10);
             let valid_char = if is_digit {
                 true
@@ -99,13 +99,13 @@ where
         self.to_numeric_strings_strict(DecimalSeparator::Auto)
     }
     /// Parse extracted numbers with configurable decimal separator
-    fn to_numbers_strict<T: FromStr>(&self, separator: DecimalSeparator) -> Vec<T>;
+    fn to_numbers_strict<N: FromStr>(&self, separator: DecimalSeparator) -> Vec<N>;
     /// Parse numbers using auto-detection
-    fn to_numbers<T: FromStr>(&self) -> Vec<T> {
-        self.to_numbers_strict::<T>(DecimalSeparator::Auto)
+    fn to_numbers<N: FromStr>(&self) -> Vec<N> {
+        self.to_numbers_strict::<N>(DecimalSeparator::Auto)
     }
     /// Split by pattern and extract the first number from each segment
-    fn split_to_numbers<T: FromStr + Copy>(&self, pattern: &str) -> Vec<T>;
+    fn split_to_numbers<N: FromStr + Copy>(&self, pattern: &str) -> Vec<N>;
     /// Normalize numeric string separators based on decimal separator convention
     fn correct_numeric_string_strict(&self, separator: DecimalSeparator) -> String;
     /// Normalize numeric string separators using auto-detection
@@ -113,16 +113,16 @@ where
         self.correct_numeric_string_strict(DecimalSeparator::Auto)
     }
     /// Extract the first parsed number using auto-detection, or None if empty
-    fn to_first_number<T: FromStr + Copy>(&self) -> Option<T> {
-        if let Some(number) = self.to_numbers::<T>().first() {
+    fn to_first_number<N: FromStr + Copy>(&self) -> Option<N> {
+        if let Some(number) = self.to_numbers::<N>().first() {
             Some(*number)
         } else {
             None
         }
     }
     /// Extract the first parsed number with configurable decimal separator, or None if empty
-    fn to_first_number_strict<T: FromStr + Copy>(&self, separator: DecimalSeparator) -> Option<T> {
-        if let Some(number) = self.to_numbers_strict::<T>(separator).first() {
+    fn to_first_number_strict<N: FromStr + Copy>(&self, separator: DecimalSeparator) -> Option<N> {
+        if let Some(number) = self.to_numbers_strict::<N>(separator).first() {
             Some(*number)
         } else {
             None
@@ -134,53 +134,52 @@ where
     }
 }
 
-impl<'a> StripCharacters<'a> for str {
+impl<'a, T: AsRef<str>> StripCharacters<'a> for T {
     fn strip_non_alphanum(&self) -> String {
-        self.chars()
-            .into_iter()
+        self.as_ref()
+            .chars()
             .filter(|c| c.is_alphanumeric())
             .collect::<String>()
     }
 
     fn strip_non_digits(&self) -> String {
-        self.chars()
-            .into_iter()
+        self.as_ref()
+            .chars()
             .filter(|c| c.is_digit(10))
             .collect::<String>()
     }
 
     fn strip_by_type(&self, ct: CharType<'a>) -> String {
-        self.chars()
-            .into_iter()
+        self.as_ref()
+            .chars()
             .filter(|c| ct.is_in_range(c) == false)
             .collect::<String>()
     }
 
     fn strip_by_types(&self, cts: &[CharType<'a>]) -> String {
-        self.chars()
-            .into_iter()
+        self.as_ref()
+            .chars()
             .filter(|c| cts.iter().any(|ct| ct.is_in_range(c)) == false)
             .collect::<String>()
     }
 
     fn filter_by_type(&self, ct: CharType<'a>) -> String {
-        self.chars()
-            .into_iter()
+        self.as_ref()
+            .chars()
             .filter(|c| ct.is_in_range(c))
             .collect::<String>()
     }
 
     fn filter_by_types(&self, cts: &[CharType<'a>]) -> String {
-        self.chars()
-            .into_iter()
+        self.as_ref()
+            .chars()
             .filter(|c| cts.iter().any(|ct| ct.is_in_range(c)))
             .collect::<String>()
     }
 
-    /// Correct numeric strings with international separators (dots, commas, spaces, apostrophes, etc.)
-    /// to standard format with dot as decimal separator only, before being parsed to numbers.
     fn correct_numeric_string_strict(&self, separator: DecimalSeparator) -> String {
-        let chars: Vec<char> = self.chars().collect();
+        let s = self.as_ref();
+        let chars: Vec<char> = s.chars().collect();
 
         let mut separators: Vec<(usize, char)> = Vec::new();
         for (i, &ch) in chars.iter().enumerate() {
@@ -195,7 +194,7 @@ impl<'a> StripCharacters<'a> for str {
         }
 
         if separators.is_empty() {
-            return self.to_string();
+            return s.to_string();
         }
 
         let decimal_idx = match separator {
@@ -245,16 +244,16 @@ impl<'a> StripCharacters<'a> for str {
         result
     }
 
-    /// Extract numeric strings with configurable decimal separator
     fn to_numeric_strings_strict(&self, separator: DecimalSeparator) -> Vec<String> {
+        let s = self.as_ref();
         let mut prev_char = ' ';
         let mut seq_num = 0;
         let mut num_string = String::new();
         let mut output: Vec<String> = Vec::new();
-        let last_index = self.chars().count().checked_sub(1).unwrap_or(0);
+        let last_index = s.chars().count().checked_sub(1).unwrap_or(0);
         let mut index: usize = 0;
         let mut prev_is_separator = false;
-        for component in self.chars() {
+        for component in s.chars() {
             let mut is_end = index == last_index;
             let is_digit = component.is_digit(10);
             if prev_is_separator && !is_digit {
@@ -311,19 +310,19 @@ impl<'a> StripCharacters<'a> for str {
         output
     }
 
-    fn to_numbers_strict<T: FromStr>(&self, separator: DecimalSeparator) -> Vec<T> {
+    fn to_numbers_strict<N: FromStr>(&self, separator: DecimalSeparator) -> Vec<N> {
         self.to_numeric_strings_strict(separator)
             .into_iter()
-            .map(|s| s.parse::<T>())
+            .map(|s| s.parse::<N>())
             .filter_map(|s| s.ok())
             .collect()
     }
 
-    fn split_to_numbers<T: FromStr + Copy>(&self, pattern: &str) -> Vec<T> {
+    fn split_to_numbers<N: FromStr + Copy>(&self, pattern: &str) -> Vec<N> {
         self.to_segments(pattern)
             .into_iter()
-            .filter_map(|part| part.to_first_number::<T>())
-            .collect::<Vec<T>>()
+            .filter_map(|part| part.to_first_number::<N>())
+            .collect::<Vec<N>>()
     }
 }
 
@@ -337,29 +336,29 @@ pub trait CharGroupMatch {
     fn is_digits_only_radix(&self, radix: u8) -> bool;
 }
 
-impl CharGroupMatch for str {
+impl<T: AsRef<str>> CharGroupMatch for T {
     fn has_digits(&self) -> bool {
-        self.chars().any(|c| c.is_ascii_digit())
+        self.as_ref().chars().any(|c| c.is_ascii_digit())
     }
 
     fn has_digits_radix(&self, radix: u8) -> bool {
-        self.chars().any(|c| c.is_digit(radix as u32))
+        self.as_ref().chars().any(|c| c.is_digit(radix as u32))
     }
 
     fn has_alphanumeric(&self) -> bool {
-        self.chars().any(char::is_alphanumeric)
+        self.as_ref().chars().any(char::is_alphanumeric)
     }
 
     fn has_alphabetic(&self) -> bool {
-        self.chars().any(char::is_alphabetic)
+        self.as_ref().chars().any(char::is_alphabetic)
     }
 
     fn is_digits_only(&self) -> bool {
-        self.chars().all(|c| c.is_ascii_digit())
+        self.as_ref().chars().all(|c| c.is_ascii_digit())
     }
 
     fn is_digits_only_radix(&self, radix: u8) -> bool {
-        self.chars().all(|c| c.is_digit(radix as u32))
+        self.as_ref().chars().all(|c| c.is_digit(radix as u32))
     }
 }
 

@@ -4,13 +4,11 @@ version = 4
 
 [[package]]
 name = "alphanumeric"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "to_segments",
 ]
 
 [[package]]
 name = "to_segments"
-version = "0.1.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "14695ff963c5594b141879e645877cb1df50fedcdd77e1a691f937e9646da902"
+version = "0.1"

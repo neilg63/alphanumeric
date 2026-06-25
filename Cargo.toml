@@ -1,6 +1,6 @@
 [package]
 name = "alphanumeric"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 description = "International number format parsing and validation with support for multiple separator conventions"
 repository = "https://github.com/neilg63/alphanumeric"
@@ -12,7 +12,7 @@ default = []
 cell_analysis = []
 
 [dependencies]
-to_segments = "0.1"
+to_segments = "^0.1.2"
 
 [lib]
 name = "alphanumeric"
