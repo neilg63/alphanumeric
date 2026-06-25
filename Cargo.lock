@@ -11,6 +11,6 @@ dependencies = [
 
 [[package]]
 name = "to_segments"
-version = "^0.1.2"
+version = "0.1.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "4a31b9217f3bf6330cc57fc844a853bfd0dd37c30572bccdfe236d193209ff91"

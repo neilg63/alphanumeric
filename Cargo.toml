@@ -12,7 +12,7 @@ default = []
 cell_analysis = []
 
 [dependencies]
-to_segments = "^0.1.2"
+to_segments = "0.1.2"
 
 [lib]
 name = "alphanumeric"
